@@ -23,7 +23,7 @@
           <textarea v-model="post.body" 
                  placeholder="Описание"></textarea>
           <input type="date"
-                v-model="post.data"
+                v-model="post.date"
                 placeholder="Дата">
           <input v-maska="'##-##'"
                 placeholder="ЧЧ-MM"
