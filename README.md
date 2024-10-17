@@ -3,5 +3,5 @@
 # Аутефикация по email и password Firebase.
 # Адаптив под мобильные устройства и планшеты.
 # http://m911026o.beget.tech/  Тестовый  сервер
-# Вход логин test77@mail.ru password 111111 
+# Вход логин test_new@mail.ru password Fr5(uiMe#4wN 
 # Можно самому зарегистрироваться по email + пароль и зайти
