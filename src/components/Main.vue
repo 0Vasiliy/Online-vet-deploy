@@ -62,6 +62,7 @@
   },
     data(){
       return{
+        intervalId: null,
         posts: [],
         dialogVisible: false,
         selectedSort: '',
@@ -81,7 +82,7 @@
         // Создание поста
         createPost(post){
         this.posts.push(post);
-        this.dialogVisible = false;  
+        this.dialogVisible = false; 
         },
         // Удаление поста
         async removePost(postId) {
@@ -98,25 +99,40 @@
           this.dialogVisible = true;
         },
         postData(posts){
+        this.posts = [];
         for(let key in posts){
-          this.posts.push({...posts[key],id: key})
+          this.posts.push({...posts[key],id: key});
         }
         console.log(this.posts)
         },
-        fetchPostsGet(){
-          axios.get('https://vet-onlain-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json')
-        .then((response) => {
-            this.postData(response.data)
-              console.log(response);
-            })
-        },   
         out(){
         const auth = getAuth(app);
         signOut(auth).then(() => {
         this.user = ''
         }).catch((error) => {
     });
-},  
+        },    
+        fetchPostsGet() {
+        axios.get('https://vet-onlain-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json')
+          .then(response => {
+              this.postData(response.data);
+          })
+          .catch(error => {
+            console.error('Ошибка при получении данных:', error);
+          });
+      },
+      startFetching() {
+        // Получаем данные сразу при монтировании компонента
+        this.fetchPostsGet();       
+        // Устанавливаем интервал 
+        this.intervalId = setInterval(this.fetchPostsGet, 2000);
+      },
+      stopFetching() {
+        // Очищаем интервал, если он был установлен
+        if (this.intervalId) {
+          clearInterval(this.intervalId);
+        }
+      },    
    },
    computed:{
     sortedPosts() {
@@ -132,8 +148,11 @@
       },
    },
    mounted() {
-      this.fetchPostsGet();        
-    },      
+      this.startFetching();
+    }, 
+    beforeDestroy() {
+      this.stopFetching(); // Останавливаем fetching 
+    },
   }
   </script>
   

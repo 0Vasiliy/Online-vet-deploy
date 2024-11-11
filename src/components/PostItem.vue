@@ -66,8 +66,8 @@ import axios from 'axios'
    },
     props:{       
         post:{
-            type: Object,
-            require: true,
+          type: Object,
+          require: true,
         },
     },
     methods: {
