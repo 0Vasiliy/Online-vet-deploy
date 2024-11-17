@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <div class="main">
       <my-button class="btn-exit" @click.prevent="out($router.push('/'))">Выход из системы</my-button>
       <h1>Запись на приём Ветклиники "ЛИС"</h1>
@@ -33,16 +33,16 @@
 
   <script>
   import axios from 'axios' 
-  import PostForm from '../components/PostForm.vue';
-  import PostList from '../components/PostList.vue';
-  import PostItem from '../components/PostItem.vue';
-  import MyButton from '../components/UI/MyButton.vue';
-  import MyDialog from '../components/UI/MyDialog.vue';
-  import MySelect from '../components/UI/MySelect.vue';
-  import MyInput from '../components/UI/MyInput.vue';
+  import PostForm from './PostForm.vue';
+  import PostList from './PostList.vue';
+  import PostItem from './PostItem.vue';
+  import MyButton from './UI/MyButton.vue';
+  import MyDialog from './UI/MyDialog.vue';
+  import MySelect from './UI/MySelect.vue';
+  import MyInput from './UI/MyInput.vue';
   import { getAuth,signOut} from "firebase/auth";
   import app from '../../firebase'
-  
+
   export default {
     name: 'Main',
     components: {
@@ -62,7 +62,6 @@
   },
     data(){
       return{
-        arhivedID: null,
         intervalId: null,
         posts: [],
         dialogVisible: false,
@@ -86,62 +85,16 @@
         this.dialogVisible = false; 
         },
         // Удаление поста
-        // async removePost(postId) {
-        // try {
-        // // Удаление поста из Firebase по ID
-        //  axios.delete(`https://vet-onlain-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${postId}.json`);
-        // this.posts = this.posts.filter(post => post.id !== postId);    
-        // } catch (error) {
-        // console.error('Ошибка при удалении поста:', error);
-        // }
-        // },
         async removePost(postId) {
         try {
-            // Находим пост по ID
-            const postToRemove = this.posts.find(post => post.id === postId);
-
-            if (postToRemove) {
-                // Добавляем пост в архив
-                await axios.post('https://vet-onlain-default-rtdb.asia-southeast1.firebasedatabase.app/archivedPosts.json', {
-                    ...postToRemove,
-                    archivedAt: new Date().toISOString() // Добавляем метку времени
-                });
-
-                // Удаляем пост из основной коллекции
-                await axios.delete(`https://vet-onlain-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${postId}.json`);
-
-                // Локально убираем пост
-                this.posts = this.posts.filter(post => post.id !== postId);
-            } else {
-                console.warn('Post not found:', postId);
-            }
+        // Удаление поста из Firebase по ID
+         axios.delete(`https://vet-onlain-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${postId}.json`);
+        this.posts = this.posts.filter(post => post.id !== postId);    
         } catch (error) {
-            console.error('Ошибка при удалении поста:', error);
+        console.error('Ошибка при удалении поста:', error);
         }
         },
-         // Проверка архивных постов, если старше 30 дней то удаляем   
-        async checkArchivedPosts() {
-        try {
-            const response = await axios.get('https://vet-onlain-default-rtdb.asia-southeast1.firebasedatabase.app/archivedPosts.json');
-            const archivedPosts = response.data || {};
-
-            const currentTime = new Date();
-            const thirtyDaysInMillis = 30 * 24 * 60 * 60 * 1000; // 30 дней в миллисекундах
-
-            for (const key in archivedPosts) {
-                const archivedPost = archivedPosts[key];
-                const archivedAt = new Date(archivedPost.archivedAt);
-
-                // Если пост был архивирован более 30 дней назад, удаляем его
-                if (currentTime - archivedAt > thirtyDaysInMillis) {
-                    await axios.delete(`https://vet-onlain-default-rtdb.asia-southeast1.firebasedatabase.app/archivedPosts/${key}.json`);
-                }
-            }
-        } catch (error) {
-            console.error('Ошибка при проверке архивных постов:', error);
-        }
-        },
-        //  Функция диалога, меняет значение dialogVisible     
+        // //  Функция диалога, меняет значение dialogVisible     
         showDialog() {
           this.dialogVisible = true;
         },
@@ -157,9 +110,9 @@
         signOut(auth).then(() => {
         this.user = ''
         }).catch((error) => {
-      });
-      }, 
-      fetchPostsGet() {
+    });
+        },    
+        fetchPostsGet() {
         axios.get('https://vet-onlain-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json')
           .then(response => {
               this.postData(response.data);
@@ -179,10 +132,7 @@
         if (this.intervalId) {
           clearInterval(this.intervalId);
         }
-      }, 
-      arhivedInterval(){
-        this.arhivedID = setInterval(this.checkArchivedPosts, 24 * 60 * 60 * 1000); // 24 часа
-    }
+      },    
    },
    computed:{
     sortedPosts() {
@@ -199,7 +149,6 @@
    },
    mounted() {
       this.startFetching();
-      this.arhivedInterval();
     }, 
     beforeDestroy() {
       this.stopFetching(); // Останавливаем fetching 
@@ -305,4 +254,4 @@
   }
 
   </style>
-  
+   -->
