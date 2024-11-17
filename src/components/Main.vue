@@ -172,7 +172,7 @@
         // Получаем данные сразу при монтировании компонента
         this.fetchPostsGet();       
         // Устанавливаем интервал 
-        this.intervalId = setInterval(this.fetchPostsGet, 2000);
+        this.intervalId = setInterval(this.fetchPostsGet, 900000);
       },
       stopFetching() {
         // Очищаем интервал, если он был установлен
