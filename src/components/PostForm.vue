@@ -90,6 +90,7 @@ export default {
     methods: {
         createPost() {
           this.post.id = Date.now();
+          this.post.createdAt = new Date().toISOString();
           this.$emit("create", this.post);
           this.fetchPostsPost();
         },

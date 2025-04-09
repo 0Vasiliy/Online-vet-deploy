@@ -1,6 +1,7 @@
   <template>
     <div class="post" :class="[btnClass,btnClass2]">
         <div v-if="!post.isEdit">
+        <div class="post-wrapper post-number">№{{ postNumber }}</div>
           <div class="post-wrapper"><strong>Фамилия: </strong>{{ post.surname }}</div>
           <div class="post-wrapper"><strong>Имя: </strong>{{ post.name }}</div>
           <div class="post-wrapper"><strong>Электронная почта: </strong>{{ post.email }}</div>
@@ -62,6 +63,8 @@ import axios from 'axios'
     return {
       isDisabled: false,
       btnClass: "white-color",
+      isNewPost: false,
+      originalPost: null,
     };
    },
     props:{       
@@ -69,22 +72,35 @@ import axios from 'axios'
           type: Object,
           require: true,
         },
+        postNumber: {
+          type: Number,
+          required: true
+        }
+    },
+    mounted() {
+      // Check if post is new (created within last hour)
+      const postTime = new Date(this.post.createdAt || Date.now());
+      const now = new Date();
+      const oneHourAgo = new Date(now - 60 * 60 * 1000);
+      this.isNewPost = postTime > oneHourAgo;
     },
     methods: {
     edit(post) {
-    post.isEdit = true;
+      // Сохраняем текущие значения перед редактированием
+      this.originalPost = { ...post };
+      post.isEdit = true;
     },
     save(post) {
-		post.isEdit = false;
-    this.updatePost();
-	  },
+      post.isEdit = false;
+      this.updatePost();
+    },
     cancellation() {
-    if(this.btnClass === "white-color") {
-      this.btnClass = "red-color";
-      this.isDisabled = !this.isDisabled;
-    } else {
-     this.btnClass = "white-color";
-    }
+      if(this.btnClass === "white-color") {
+        this.btnClass = "red-color";
+        this.isDisabled = !this.isDisabled;
+      } else {
+        this.btnClass = "white-color";
+      }
     },
     executed(){
     if(this.btnClass2 === "white-color") {
@@ -166,6 +182,9 @@ import axios from 'axios'
     word-wrap: break-word;
     height: auto;
   }
+.post-number{
+  color: teal;
+}
   @media(max-width:1420px){
     .post-wrapper{
     max-width: 300px;

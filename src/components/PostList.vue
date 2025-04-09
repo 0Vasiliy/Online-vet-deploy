@@ -6,6 +6,7 @@
       v-for="post in posts"
       :post="post"
       :key="post.id"
+      :postNumber="post.postNumber"
       @remove="$emit('remove',post.id)"
       >  
   </PostItem>
