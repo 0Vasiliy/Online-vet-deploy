@@ -3,9 +3,9 @@ import Main from '../components/Main.vue'
 import login from '../components/authentication/Login.vue'
 import Register from '../components/authentication/Register.vue'
 import About from '../components/authentication/About.vue'
-// import PostId from '../components/PostId.vue'
+
 import { getAuth, onAuthStateChanged} from "firebase/auth";
-import app from '../../firebase'
+import app from '../firebase/config'
 import "firebase/auth"
 import "firebase/app"
 
@@ -20,9 +20,6 @@ const routes = [
           requiresAuth: true
         }
     },  
-    // { path: '/posts/:id',
-    //  component: PostId
-    // },
     { path: '/login',
       component: login,
       name: login,

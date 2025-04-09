@@ -34,7 +34,7 @@
 import MyButton from '../UI/MyButton.vue';
 import MyInput from '../UI/MyInput.vue';
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import app from '../../../firebase'
+import app from '../../firebase/config'
 
 export default {
  name: 'Register',

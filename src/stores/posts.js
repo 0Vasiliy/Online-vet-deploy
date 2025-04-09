@@ -1,0 +1,157 @@
+import { defineStore } from 'pinia';
+import { postsApi } from '../api/posts';
+
+export const usePostsStore = defineStore('posts', {
+  state: () => ({
+    posts: [],
+    archivedPosts: [],
+    currentPage: 1,
+    postsPerPage: 5,
+    selectedSort: '',
+    searchQuery: '',
+    sortOptions: [
+      { value: 'surname', name: 'По фамилии' },
+      { value: 'name', name: 'По имени' },
+      { value: 'phone', name: 'По телефону' },
+      { value: 'email', name: 'По эл.почте' },
+      { value: 'body', name: 'По услуге' },
+      { value: 'date', name: 'По дате' },
+      { value: 'time', name: 'По времени' },
+    ],
+    intervalId: null,
+    arhivedID: null
+  }),
+
+  getters: {
+    sortedPosts() {
+      if (!this.selectedSort) return this.posts;
+      
+      return [...this.posts].sort((post1, post2) => {
+        const value1 = post1[this.selectedSort] || '';
+        const value2 = post2[this.selectedSort] || '';
+        
+        if (this.selectedSort === 'date') {
+          return new Date(value1) - new Date(value2);
+        }
+        
+        if (this.selectedSort === 'time') {
+          const [hours1, minutes1] = value1.split('-').map(Number);
+          const [hours2, minutes2] = value2.split('-').map(Number);
+          return (hours1 * 60 + minutes1) - (hours2 * 60 + minutes2);
+        }
+        
+        return value1.toString().localeCompare(value2.toString());
+      });
+    },
+
+    searchedPosts() {
+      return this.sortedPosts.filter(post => 
+        post.surname.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    },
+
+    paginatedPosts() {
+      const start = (this.currentPage - 1) * this.postsPerPage;
+      const end = start + this.postsPerPage;
+      return this.searchedPosts.slice(start, end);
+    },
+
+    totalPages() {
+      return Math.ceil(this.searchedPosts.length / this.postsPerPage);
+    }
+  },
+
+  actions: {
+    async fetchPosts() {
+      try {
+        const posts = await postsApi.getPosts();
+        this.posts = [];
+        let postNumber = 1;
+        
+        for (let key in posts) {
+          const post = { ...posts[key], id: key };
+          post.postNumber = post.postNumber || postNumber++;
+          this.posts.push(post);
+        }
+        
+        this.posts.sort((a, b) => b.postNumber - a.postNumber);
+      } catch (error) {
+        console.error('Ошибка при получении постов:', error);
+      }
+    },
+
+    async createPost(post) {
+      try {
+        const maxNumber = this.posts.length > 0 
+          ? Math.max(...this.posts.map(p => p.postNumber || 0))
+          : 0;
+        
+        post.postNumber = maxNumber + 1;
+        const postId = await postsApi.createPost(post);
+        post.id = postId;
+        this.posts.unshift(post);
+      } catch (error) {
+        console.error('Ошибка при создании поста:', error);
+      }
+    },
+
+    async removePost(postId) {
+      try {
+        const postToRemove = this.posts.find(post => post.id === postId);
+        if (postToRemove) {
+          await postsApi.archivePost(postToRemove);
+          await postsApi.deletePost(postId);
+          this.posts = this.posts.filter(post => post.id !== postId);
+        }
+      } catch (error) {
+        console.error('Ошибка при удалении поста:', error);
+      }
+    },
+
+    async checkArchivedPosts() {
+      try {
+        const archivedPosts = await postsApi.getArchivedPosts();
+        const currentTime = new Date();
+        const thirtyDaysInMillis = 30 * 24 * 60 * 60 * 1000;
+
+        for (const key in archivedPosts) {
+          const archivedPost = archivedPosts[key];
+          const archivedAt = new Date(archivedPost.archivedAt);
+
+          if (currentTime - archivedAt > thirtyDaysInMillis) {
+            await postsApi.deleteArchivedPost(key);
+          }
+        }
+      } catch (error) {
+        console.error('Ошибка при проверке архивных постов:', error);
+      }
+    },
+
+    startFetching() {
+      this.fetchPosts();
+      this.intervalId = setInterval(this.fetchPosts, 900000);
+    },
+
+    stopFetching() {
+      if (this.intervalId) {
+        clearInterval(this.intervalId);
+      }
+    },
+
+    startArchivedInterval() {
+      this.arhivedID = setInterval(this.checkArchivedPosts, 24 * 60 * 60 * 1000);
+    },
+
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
+
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    }
+  }
+}); 

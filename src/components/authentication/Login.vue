@@ -35,7 +35,7 @@ import { getAuth,
     onAuthStateChanged,
     signOut
     } from "firebase/auth";
-import app from '../../../firebase'
+import app from '../../firebase/config'
 
 export default {
  name: 'Login',
