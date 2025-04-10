@@ -36,7 +36,7 @@ export const usePostsStore = defineStore('posts', {
             return Number(value1) - Number(value2);
             
           case 'date':
-            return new Date(value1) - new Date(value2);
+            return new Date(value2) - new Date(value1);
             
           case 'time':
             const [hours1, minutes1] = value1.split('-').map(Number);
