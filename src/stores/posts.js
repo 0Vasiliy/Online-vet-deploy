@@ -10,13 +10,14 @@ export const usePostsStore = defineStore('posts', {
     selectedSort: '',
     searchQuery: '',
     sortOptions: [
+      { value: 'postNumber', name: 'По номеру' },
       { value: 'surname', name: 'По фамилии' },
       { value: 'name', name: 'По имени' },
-      { value: 'phone', name: 'По телефону' },
       { value: 'email', name: 'По эл.почте' },
+      { value: 'phone', name: 'По телефону' },
       { value: 'body', name: 'По услуге' },
       { value: 'date', name: 'По дате' },
-      { value: 'time', name: 'По времени' },
+      { value: 'time', name: 'По времени' }
     ],
     intervalId: null,
     arhivedID: null
@@ -30,24 +31,34 @@ export const usePostsStore = defineStore('posts', {
         const value1 = post1[this.selectedSort] || '';
         const value2 = post2[this.selectedSort] || '';
         
-        if (this.selectedSort === 'date') {
-          return new Date(value1) - new Date(value2);
+        switch (this.selectedSort) {
+          case 'postNumber':
+            return Number(value1) - Number(value2);
+            
+          case 'date':
+            return new Date(value1) - new Date(value2);
+            
+          case 'time':
+            const [hours1, minutes1] = value1.split('-').map(Number);
+            const [hours2, minutes2] = value2.split('-').map(Number);
+            return (hours1 * 60 + minutes1) - (hours2 * 60 + minutes2);
+            
+          default:
+            return value1.toString().localeCompare(value2.toString(), 'ru', { sensitivity: 'base' });
         }
-        
-        if (this.selectedSort === 'time') {
-          const [hours1, minutes1] = value1.split('-').map(Number);
-          const [hours2, minutes2] = value2.split('-').map(Number);
-          return (hours1 * 60 + minutes1) - (hours2 * 60 + minutes2);
-        }
-        
-        return value1.toString().localeCompare(value2.toString());
       });
     },
 
     searchedPosts() {
-      return this.sortedPosts.filter(post => 
-        post.surname.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
+      if (!this.searchQuery) return this.sortedPosts;
+      
+      const query = this.searchQuery.trim().toLowerCase();
+      if (!query) return this.sortedPosts;
+      
+      return this.sortedPosts.filter(post => {
+        const surname = post.surname?.toLowerCase() || '';
+        return surname.includes(query);
+      });
     },
 
     paginatedPosts() {
@@ -152,6 +163,16 @@ export const usePostsStore = defineStore('posts', {
       if (this.currentPage > 1) {
         this.currentPage--;
       }
+    },
+
+    setSort(value) {
+      this.selectedSort = value;
+      this.currentPage = 1;
+    },
+
+    setSearch(value) {
+      this.searchQuery = value;
+      this.currentPage = 1;
     }
   }
 }); 

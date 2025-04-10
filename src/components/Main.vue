@@ -13,14 +13,24 @@
           class="main_btn"   
           >Архив постов
         </my-button>
-        <my-input 
-        v-model="searchQuery"
-        class="searh"
-        placeholder="Поиск по фамилии..."
-        ></my-input>
+        <div class="search-container">
+          <my-input 
+            v-model="searchQuery"
+            class="search"
+            placeholder="Поиск по фамилии..."
+            @keyup.enter="handleSearch"
+            @input="handleSearch"
+          ></my-input>
+          <my-button
+            @click="handleSearch"
+            class="search-btn"
+          >Поиск</my-button>
+        </div>
         <my-select 
-        v-model="selectedSort"
-        :options="sortOptions"
+          v-model="selectedSort"
+          :options="sortOptions"
+          placeholder="Сортировка"
+          @update:modelValue="handleSort"
         />
       </div>
       <my-dialog v-model:show="dialogVisible">
@@ -116,7 +126,6 @@
     },
     // Методы компонента
     methods: {
-      // Действия из store
       ...mapActions(usePostsStore, [
         'createPost',
         'removePost',
@@ -124,8 +133,16 @@
         'prevPage',
         'startFetching',
         'stopFetching',
-        'startArchivedInterval'
+        'startArchivedInterval',
+        'setSort',
+        'setSearch'
       ]),
+      handleSearch() {
+        this.setSearch(this.searchQuery.trim());
+      },
+      handleSort(value) {
+        this.setSort(value);
+      },
       // Обработка создания поста
       async handleCreatePost(post) {
         await this.createPost(post);
@@ -172,7 +189,7 @@
         } catch (error) {
           console.error('Ошибка при отправке уведомления в Telegram:', error);
         }
-      }
+      },
     },
     // Хуки жизненного цикла
     mounted() {
@@ -318,6 +335,21 @@
       .main>.dialog>.dialog_content{
       min-width: 250px;
     }
+  }
+  .search-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .search {
+    width: 200px;
+    height: 40px;
+  }
+
+  .search-btn {
+    height: 40px;
+    padding: 0 15px;
   }
   </style>
   
