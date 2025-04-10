@@ -57,13 +57,17 @@ export default {
     async fetchArchivedPosts() {
       try {
         const response = await axios.get('https://vet-onlain-default-rtdb.asia-southeast1.firebasedatabase.app/archivedPosts.json');
-        const posts = response.data || {};
-        this.archivedPosts = Object.entries(posts).map(([key, value]) => ({
-          ...value,
-          id: key
-        }));
+        const posts = response.data;
+        this.archivedPosts = [];
+        for (let key in posts) {
+          this.archivedPosts.push({
+            ...posts[key],
+            id: key
+          });
+        }
+        this.archivedPosts.sort((a, b) => new Date(b.archivedAt) - new Date(a.archivedAt));
       } catch (error) {
-        console.error('Ошибка при получении архивных постов:', error);
+        console.error('Error fetching archived posts:', error);
       }
     },
     async restorePost(post) {

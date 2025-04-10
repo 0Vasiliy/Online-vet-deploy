@@ -1,6 +1,9 @@
 <template>
   <form @submit.prevent>
+    <div class="form-header">
       <h4>Запись на приём</h4>
+      <my-button class="close-btn" @click="$emit('close')">×</my-button>
+    </div>
     <my-input
       class="form-input"
       name="surname"
@@ -88,40 +91,73 @@ export default {
         };
     },
     methods: {
-        createPost() {
-          this.post.id = Date.now();
-          this.post.createdAt = new Date().toISOString();
-          this.$emit("create", this.post);
-          this.fetchPostsPost();
+        async createPost() {
+          try {
+            this.post.id = Date.now();
+            this.post.createdAt = new Date().toISOString();
+            await this.fetchPostsPost();
+            this.$emit("create", this.post);
+            // Очищаем форму
+            this.post = {
+              surname: "",
+              name: "",
+              email: "",
+              phone: "",
+              body: "",
+              date: "",
+              time: "",
+            };
+            // Закрываем модальное окно
+            this.$emit('close');
+          } catch (error) {
+            console.error('Error creating post:', error);
+          }
         },
-        fetchPostsPost(){     
-           axios
-           .post('https://vet-onlain-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json', this.post,
-           {
-            surname: this.surname,
-            name: this.name,
-            email: this.email,
-            phone: this.phone,
-            body: this.body,
-            date: this.date,
-            time: this.time            
-            }
-            )
-          .then(response => {
-              console.log(response);
-              })
-          .catch(error => {
-           console.log(error); 
-            });
-          },
+        async fetchPostsPost(){     
+          try {
+            const response = await axios.post(
+              'https://vet-onlain-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json',
+              this.post
+            );
+            console.log('Post created successfully:', response);
+          } catch (error) {
+            console.error('Error creating post:', error);
+            throw error;
+          }
+        },
      },
     components: { MyInput }
 }
 </script>
 
 <style scoped>
+  .form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .close-btn {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    font-size: 24px;
+    line-height: 1;
+    border-radius: 50%;
+    background-color: #f44336;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+  }
+  .close-btn:hover {
+    background-color: #d32f2f;
+  }
   h4{
     font-size: 24px;
+    margin: 0;
   }
   .postform_btns{
     display: flex;

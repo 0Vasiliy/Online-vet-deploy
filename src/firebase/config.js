@@ -1,9 +1,8 @@
-// Импорт необходимых функций из Firebase
 import { initializeApp } from 'firebase/app';
 import { getDatabase } from 'firebase/database';
 import { getAuth } from 'firebase/auth';
 
-// Конфигурация Firebase проекта
+// Конфигурация Firebase проекта с тестовой базой
 const firebaseConfig = {
   apiKey: "AIzaSyBjP3AEJNKVFp07ROomynZ_QzNYyzsug_4",
   authDomain: "vet-onlain.firebaseapp.com",
