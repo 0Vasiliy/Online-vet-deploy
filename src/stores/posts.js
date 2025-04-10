@@ -50,14 +50,20 @@ export const usePostsStore = defineStore('posts', {
     },
 
     searchedPosts() {
-      if (!this.searchQuery) return this.sortedPosts;
-      
-      const query = this.searchQuery.trim().toLowerCase();
-      if (!query) return this.sortedPosts;
-      
+      if (!this.searchQuery || this.searchQuery.trim() === '') {
+        return this.sortedPosts;
+      }
+
+      const searchTerm = this.searchQuery.trim().toLowerCase();
+
       return this.sortedPosts.filter(post => {
-        const surname = post.surname?.toLowerCase() || '';
-        return surname.includes(query);
+        if (!post || !post.surname) {
+          return false;
+        }
+
+        const surname = post.surname.toString().toLowerCase();
+        
+        return surname.includes(searchTerm);
       });
     },
 

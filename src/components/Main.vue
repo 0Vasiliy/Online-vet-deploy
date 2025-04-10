@@ -19,7 +19,7 @@
             class="search"
             placeholder="Поиск по фамилии..."
             @keyup.enter="handleSearch"
-            @input="handleSearch"
+            @input="handleInput"
           ></my-input>
           <my-button
             @click="handleSearch"
@@ -105,6 +105,7 @@
       return {
         dialogVisible: false, // Видимость диалога создания поста
         archiveDialogVisible: false, // Видимость диалога архива
+        searchQuery: '', // Добавляем локальное состояние для поиска
         telegramConfig: { // Конфигурация для Telegram уведомлений
           botToken: 'YOUR_BOT_TOKEN',
           chatIds: ['CHAT_ID_1', 'CHAT_ID_2'],
@@ -116,7 +117,6 @@
       ...mapState(usePostsStore, [
         'posts',
         'selectedSort',
-        'searchQuery',
         'sortOptions',
         'currentPage',
         'postsPerPage',
@@ -137,8 +137,13 @@
         'setSort',
         'setSearch'
       ]),
+      handleInput() {
+        // Обработка ввода для мгновенного поиска
+        this.setSearch(this.searchQuery);
+      },
       handleSearch() {
-        this.setSearch(this.searchQuery.trim());
+        // Обработка поиска по Enter или кнопке
+        this.setSearch(this.searchQuery);
       },
       handleSort(value) {
         this.setSort(value);
