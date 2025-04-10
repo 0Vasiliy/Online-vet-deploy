@@ -25,7 +25,8 @@
       </div>
       <my-dialog v-model:show="dialogVisible">
           <PostForm 
-            @create="handleCreatePost">
+            @create="handleCreatePost"
+            @close="dialogVisible = false">
           </PostForm>
       </my-dialog>
       <my-dialog v-model:show="archiveDialogVisible">
